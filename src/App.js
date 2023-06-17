@@ -7,6 +7,7 @@ import StartScreen from "./components/StartScreen";
 import Question from "./components/Question";
 import Progress from "./components/Progress";
 import FinishScreen from "./components/FinishScreen";
+import Timer from "./components/Timer";
 
 const initialState = {
   questions: [],
@@ -15,6 +16,7 @@ const initialState = {
   answer: null,
   points: 0,
   highscore: 0,
+  secondsRemaining: 10,
 };
 
 function reducer(state, action) {
@@ -48,6 +50,13 @@ function reducer(state, action) {
       highscore:
         state.highscore < state.points ? state.points : state.highscore,
     };
+  if (action.type === "tick") {
+    return {
+      ...state,
+      secondsRemaining: state.secondsRemaining - 1,
+      status: state.secondsRemaining < 1 ? "finish" : state.status,
+    };
+  }
   if (action.type === "restart")
     return {
       ...initialState,
@@ -58,8 +67,10 @@ function reducer(state, action) {
 }
 
 function App() {
-  const [{ questions, status, index, answer, points, highscore }, dispatch] =
-    useReducer(reducer, initialState);
+  const [
+    { questions, status, index, answer, points, highscore, secondsRemaining },
+    dispatch,
+  ] = useReducer(reducer, initialState);
   const numQuestions = questions.length;
   const maxPossiblePoints = questions.reduce(
     (acc, question) => acc + question.points,
@@ -98,6 +109,7 @@ function App() {
               dispatch={dispatch}
               answer={answer}
             />
+            <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />
             {answer !== null && index <= 13 ? (
               <button
                 className="btn btn-ui"
