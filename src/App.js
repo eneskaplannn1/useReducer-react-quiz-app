@@ -6,6 +6,7 @@ import Error from "./utilits/Error";
 import StartScreen from "./components/StartScreen";
 import Question from "./components/Question";
 import Progress from "./components/Progress";
+import FinishScreen from "./components/FinishScreen";
 
 const initialState = {
   questions: [],
@@ -13,6 +14,7 @@ const initialState = {
   index: 0,
   answer: null,
   points: 0,
+  highscore: 0,
 };
 
 function reducer(state, action) {
@@ -28,7 +30,6 @@ function reducer(state, action) {
   //! when user made a choice
   if (action.type === "newAnswer") {
     const question = state.questions[state.index];
-    console.log(question.correctOption, state.answer);
     return {
       ...state,
       answer: action.payload,
@@ -40,19 +41,31 @@ function reducer(state, action) {
   }
   if (action.type === "newQuestion")
     return { ...state, index: state.index + 1, answer: null };
+  if (action.type === "finished")
+    return {
+      ...state,
+      status: "finish",
+      highscore:
+        state.highscore < state.points ? state.points : state.highscore,
+    };
+  if (action.type === "restart")
+    return {
+      ...initialState,
+      questions: state.questions,
+      highscore: state.highscore,
+      status: "ready",
+    };
 }
 
 function App() {
-  const [{ questions, status, index, answer, points }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [{ questions, status, index, answer, points, highscore }, dispatch] =
+    useReducer(reducer, initialState);
   const numQuestions = questions.length;
   const maxPossiblePoints = questions.reduce(
     (acc, question) => acc + question.points,
     0
   );
-
+  console.log(questions);
   useEffect(() => {
     fetch("http://localhost:4000/questions")
       .then((res) => res.json())
@@ -85,7 +98,7 @@ function App() {
               dispatch={dispatch}
               answer={answer}
             />
-            {answer !== null ? (
+            {answer !== null && index <= 13 ? (
               <button
                 className="btn btn-ui"
                 onClick={() => dispatch({ type: "newQuestion" })}
@@ -95,7 +108,25 @@ function App() {
             ) : (
               ""
             )}
+            {index > 13 ? (
+              <button
+                className="btn btn-ui"
+                onClick={() => dispatch({ type: "finished" })}
+              >
+                Finish
+              </button>
+            ) : (
+              ""
+            )}
           </>
+        )}
+        {status === "finish" && (
+          <FinishScreen
+            points={points}
+            maxPossiblePoints={maxPossiblePoints}
+            highscore={highscore}
+            dispatch={dispatch}
+          />
         )}
       </Main>
     </div>
