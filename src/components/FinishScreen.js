@@ -1,7 +1,11 @@
 import { Fragment } from "react";
+import { useQuiz } from "../context/QuizContext";
 
-function FinishScreen({ points, maxPossiblePoints, highscore, dispatch }) {
+function FinishScreen() {
+
+  const { points, maxPossiblePoints, highscore, dispatch } = useQuiz();
   const percentage = (points / maxPossiblePoints) * 100;
+
   return (
     <Fragment>
       <div className="result">
