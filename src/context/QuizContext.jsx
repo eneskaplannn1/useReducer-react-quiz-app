@@ -222,7 +222,7 @@ function QuizProvider({ children }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch({ type: "dataReceived", payload: quizQuestions });
-    }, 1000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
