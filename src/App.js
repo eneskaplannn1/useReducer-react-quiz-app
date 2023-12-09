@@ -17,8 +17,8 @@ function App() {
       <Header />
       <Main>
         {status === "loading" && <Loader />}
-        {status === "error" && <Error />}
         {status === "ready" && <StartScreen />}
+        {status === "error" && <Error />}
         {status === "active" && (
           <>
             <Progress />
